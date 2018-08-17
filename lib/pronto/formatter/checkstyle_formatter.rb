@@ -3,8 +3,9 @@ require 'rexml/document'
 module Pronto
   module Formatter
     class CheckstyleFormatter < Base
-      def initialize
-        @output = ''
+      def initialize(output: '')
+        @output = output
+        @write_file = true unless output.empty?
       end
 
       def format(messages, _, _)
@@ -45,7 +46,11 @@ module Pronto
       end
 
       def close_xml
-        @document.write(@output, 2)
+        if @write_file
+          @document.write(File.open(@output, "w"), 2)
+        else
+          @document.write(@output, 2)
+        end
       end
 
       def to_checkstyle_severity(pronto_level)
